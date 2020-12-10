@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>JS + CSS Clock</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8">
+    <title>JS + CSS Clock</title>
+  </head>
+  <body>
 
 
     <div class="clock">
@@ -16,59 +16,70 @@
     </div>
 
 
-  <style>
-    html {
-      background: #018DED url(https://unsplash.it/1500/1000?image=881&blur=5);
-      background-size: cover;
-      font-family: 'helvetica neue';
-      text-align: center;
-      font-size: 10px;
-    }
+    <style>
+      html {
+        background: #018DED url(https://unsplash.it/1500/1000?image=881&blur=5);
+        background-size: cover;
+        font-family: 'helvetica neue';
+        text-align: center;
+        font-size: 10px;
+      }
 
-    body {
-      margin: 0;
-      font-size: 2rem;
-      display: flex;
-      flex: 1;
-      min-height: 100vh;
-      align-items: center;
-    }
+      body {
+        margin: 0;
+        font-size: 2rem;
+        display: flex;
+        flex: 1;
+        min-height: 100vh;
+        align-items: center;  /* ^^^^ This specifies the default alignment for items inside the "flexible container". ¿Does this mean everything inside the <body> element in this HTML document will be default aligned to the center?*/
+      }
 
-    .clock {
-      width: 30rem;
-      height: 30rem;
-      border: 20px solid white;
-      border-radius: 50%;
-      margin: 50px auto;
-      position: relative;
-      padding: 2rem;
-      box-shadow:
-        0 0 0 4px rgba(0,0,0,0.1),
-        inset 0 0 0 3px #EFEFEF,
-        inset 0 0 10px black,
-        0 0 10px rgba(0,0,0,0.2);
-    }
+      .clock {
+        width: 30rem;
+        height: 30rem;
+        border: 20px solid white;
+        border-radius: 50%;
+        margin: 50px auto;
+        position: relative;
+        padding: 2rem;
+        box-shadow:
+          0 0 0 4px rgba(0,0,0,0.1),
+          inset 0 0 0 3px #EFEFEF,
+          inset 0 0 10px black,
+          0 0 10px rgba(0,0,0,0.2);
+      }
 
-    .clock-face {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transform: translateY(-3px); /* account for the height of the clock hands */
-    }
+      .clock-face {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform: translateY(-3px); /* account for the height of the clock hands. ¿I think this is actually pushing the clock hands up 3 pixels, and not down 3 pixels... hmmmm? */
+      }
 
-    .hand {
-      width: 50%;
-      height: 6px;
-      background: black;
-      position: absolute;
-      top: 50%;
-    }
+      .hand {
+        width: 50%;
+        height: 6px;
+        background: black;
+        position: absolute;
+        top: 50%;
+        transform-origin: 100%; /* (1) By default the origin is 50%, which means that the hands would rotate around their own center, which is not what we want it to do. ¿But how do we know that it's 100% right? And why doesn't that get messed up as the hands rotate? */
+        transform: rotate(90deg); /* Makes the hands default to the 12 noon position */
+        transition: all 0.5s; /* This makes every change in the hand transformations (e.g. "transform: rotate(20deg)") take 0.5 seconds to complete instead of moving immediately. ¿I guess it makes any other transition for things with the .hand class also take 0.5 seconds? */
+        transition-timing-function: cubic-bezier(0.08, 2.65, 0.58, 1); /* The transition timing function has this cool feature where if you go to Inspect > Styles for the element you want to mess with transition timing for, you can manipulate the cubic-bezier function which is that little graph wave box you'll see -- if you click on it in your browser Inspect, you can mess around with it so that it overshoots the transition first, and then comes back to the correct position, which feels like a ticking motion to the viewer. */
+      }
 
-  </style>
+    </style>
 
-  <script>
-
-
-  </script>
-</body>
+    <script>
+      const secondHand = document.querySelector('.second-hand'); // We're "selecting" the secondHand here... I think we're creating it though. ¿Is this a variable or an element?
+      function setDate(){
+        const now = new Date(); // ¿Date is a type of object that is built into JavaScript? So we've created a variable here called "now", which makes "now" the current date/time every second.
+        const seconds = now.getSeconds();
+        const secondsDegrees = (seconds/60)*360 + 90 //The plus 90 here offsets the default 90 degrees that we set in line 66.  
+        secondHand.style.transform = `rotate(${secondsDegrees}deg)` //<< We're adding some style to our secondHand variable? 
+        console.log(seconds)
+      }
+      setInterval(setDate, 1000); // ¿Does this mean that all of the <script> will run every second? OHHHHH I think the first parameter is the function you're setting the interval for, and then second parameter is the interval it runs on. 1000 means 1000 milliseconds, aka 1 second.
+    </script>
+  </body>
 </html>
