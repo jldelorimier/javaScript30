@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JS Drum Kit</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+  <div class="keys">
+    <div data-key="65" class="key">
+      <kbd>A</kbd>
+      <span class="sound">clap</span>
+    </div>
+    <div data-key="83" class="key">
+      <kbd>S</kbd>
+      <span class="sound">hihat</span>
+    </div>
+    <div data-key="68" class="key">
+      <kbd>D</kbd>
+      <span class="sound">kick</span>
+    </div>
+    <div data-key="70" class="key">
+      <kbd>F</kbd>
+      <span class="sound">openhat</span>
+    </div>
+    <div data-key="71" class="key">
+      <kbd>G</kbd>
+      <span class="sound">boom</span>
+    </div>
+    <div data-key="72" class="key">
+      <kbd>H</kbd>
+      <span class="sound">ride</span>
+    </div>
+    <div data-key="74" class="key">
+      <kbd>J</kbd>
+      <span class="sound">snare</span>
+    </div>
+    <div data-key="75" class="key">
+      <kbd>K</kbd>
+      <span class="sound">tom</span>
+    </div>
+    <div data-key="76" class="key">
+      <kbd>L</kbd>
+      <span class="sound">tink</span>
+    </div>
+  </div>
+
+  <audio data-key="65" src="sounds/clap.wav"></audio>
+  <audio data-key="83" src="sounds/hihat.wav"></audio>
+  <audio data-key="68" src="sounds/kick.wav"></audio>
+  <audio data-key="70" src="sounds/openhat.wav"></audio>
+  <audio data-key="71" src="sounds/boom.wav"></audio>
+  <audio data-key="72" src="sounds/ride.wav"></audio>
+  <audio data-key="74" src="sounds/snare.wav"></audio>
+  <audio data-key="75" src="sounds/tom.wav"></audio>
+  <audio data-key="76" src="sounds/tink.wav"></audio>
+
+<script>
+
+  
+  function playSound(e){ // (1) For the 'keydown' event in the window, run function with the parameter 'e', which is the event itself. In the function...
+    const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`); //(a) define the variable "audio" as the audio element in this HTML document where the data-key attribute is equal to the keyCode for this keydown event.
+    const key = document.querySelector(`.key[data-key="${e.keyCode}"]`); //(b) define the variable "key" as an element in this HTML document with a class of "key" where the data-key attribute is equal to the keyCode for this keydown event, i.e., the div with the class "key" for this data-key= the keydown key's keyCode. ¿How does the file know what a keyCode is? Is this built into JS?
+    if(!audio) return; //(c) stop function from running all together if no audio associated with that keyCode. i.e. If audio = null, which I think is the same as saying audio = false, then just return the function and stop running it.
+    audio.currentTime = 0; //(d) whenever this function runs and "audio" variable is updated, reset the audio at time 0. Without this line, new audio clips will play from the beginning simultaneously, but the same audio click over and over will not start again until it's last play is over. 
+    audio.play(); //(e) play the audio
+    key.classList.add('playing'); //(f) add the class ".playing" to the div for this key in the HTML file. i.e. the HTML in your Elements under Inspect in your web browser will change from <div data-key="65" class="key"> to <div data-key="65" class="key playing">. ¿I guess if multiple classes are applied to one element, you can just list them next to each other without spaces? Because there's no "key playing" class; there's just the "key" class and the "playing" class. Does the order that these classes are written in in HTML matter? .key and .playing have conflicting border colors. ¿Since "playing" comes second in the HTML, does it override the border color from the "key" class? It must, right?
+  };
+
+  //let's define the removeTransition function that we might run on line 78:
+  function removeTransition(e){ //(4) We run the removeTransition function on the 'transitionend' event for each key once the 'transition' ¿of 0.07 s (defined in CSS file) ends I think?. this function runs at the "transitionend". "transition" is defined for the .key class in the CSS file. 
+    console.log(e);
+    if (e.propertyName !== 'transform') return; // (a) skip it if it's not a transform. He said generally you just want to choose the one that's taking the longest, but in this case they're all the same length. ¿What does the 'transform' event even do? ¿Why are we skilling the other TransitionEvents (border-bottom-color, border-left-color, border-right-color, border-top-color, box-shadow)? 
+    this.classList.remove('playing'); //"'This' is always equal to whatever got called against it." One way to think of "this" is "the closest parent object the method is defined on." In this case the 'this' is the div with data-key="70". "this" must be the variable "key" defined on line 64, because we're running "this" inside the removeTransition function, which was called by the each loop for the keys on line 80, which calls the "key" variable from line 64. So this makes sense. ¿Does .classList refer to all of the classes that currently apply to the object? or .... a broader list somewhere else?
+  }
+
+  const keys = document.querySelectorAll('.key'); // (2) Define the variable "keys" as all of the elements in this HTML document with the class "key". ¿So this should select all of the divs in this HTML document with a class of "key"? <Well, it creates an ¿array? of elements with the class "key". Define a variable "keys" that will be  all of the elements from this HTML document with the "key" class. ¿I tried console logging the "keys" variable, it prints [object NodeList], but he says in the video at 13:55 that it's an array... which is why we have to do the each loop he says, because you cannot listen on all of the elements in an array, you must explicitly loop over every  single element and attach an event listener.
+  console.log(`I am console logging the keys variable: ${keys}`);
+  keys.forEach(key => key.addEventListener('transitionend', removeTransition)); // (3) On all of the keys, we add an eventlistenerfor the for the event 'transitionend' (¿is this an array or an object?). On the 'transitionend' event, we run the removeTransition function  ¿this must be an each loop in JS? ¿Is 'transitionend' a standard JS syntax? or did we define it somewhere? 
+  window.addEventListener('keydown', playSound); //For .addEventListener method, parameters are first: the event type; second: the function that happens on that event. i.e. (event, function, useCapture). useCapture is optional to fill in; default value is false. 
+</script>
+
+
+</body>
+</html>
