@@ -70,14 +70,31 @@
 
     </style>
 
-    <script>
-      const secondHand = document.querySelector('.second-hand'); // We're "selecting" the secondHand here... I think we're creating it though. ¿Is this a variable or an element?
+    <script> //***12/9/20 1022PM CONTINUE WRITING SCRIPT TO MAKE MINUTE AND HOUR HANDS MOVE***
+      
+      const secondHand = document.querySelector('.second-hand'); // We're "selecting" the secondHand here... I think we're creating it though. ¿Is this a variable or an element? Initialized the secondHand as the only div with the class .second-hand. 
+      const minuteHand = document.querySelector('.min-hand'); 
+      const hourHand = document.querySelector('.hour-hand');
+      
       function setDate(){
         const now = new Date(); // ¿Date is a type of object that is built into JavaScript? So we've created a variable here called "now", which makes "now" the current date/time every second.
         const seconds = now.getSeconds();
         const secondsDegrees = (seconds/60)*360 + 90 //The plus 90 here offsets the default 90 degrees that we set in line 66.  
+        // console.log(`SecondDegrees: ${secondsDegrees}`)
         secondHand.style.transform = `rotate(${secondsDegrees}deg)` //<< We're adding some style to our secondHand variable? 
-        console.log(seconds)
+        
+        const minutes = now.getMinutes();
+        const minutesDegrees = (minutes/60) * 360 + 90;
+        // console.log(`MinuteDegrees: ${minutesDegrees}`)
+        minuteHand.style.transform = `rotate(${minutesDegrees}deg)`
+
+        const hours = now.getHours();
+        // console.log(`Hours: ${hours}`);
+        const hoursDegrees = (hours / 12) * 360 + 90;
+        // console.log(`HoursDegrees: ${hoursDegrees}`);
+        hourHand.style.transform = `rotate(${hoursDegrees}deg)`;
+
+        console.log(`${seconds}, ${minutes}, ${hours}`)
       }
       setInterval(setDate, 1000); // ¿Does this mean that all of the <script> will run every second? OHHHHH I think the first parameter is the function you're setting the interval for, and then second parameter is the interval it runs on. 1000 means 1000 milliseconds, aka 1 second.
     </script>
