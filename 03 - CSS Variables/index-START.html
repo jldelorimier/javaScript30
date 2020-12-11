@@ -1,3 +1,4 @@
+<!-- Why this one is fun: Wes: "Today we're going to be talking about CSS variables... CSS variables can be updated with JavaScript, meaning that, when you update a variable in CSS, everywhere on the page that that variable is referenced will update itself. With SAS, you define them at compile time, and then it gets compiled and then you cannot change it." -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,6 +22,22 @@
   <img src="https://source.unsplash.com/7bwQXzbF6KE/800x500">
 
   <style>
+    /* You declare CSS variables in the <style> section of the HTML document on an element; in our case we're going to declare it on root, which is the highest level you can get, similar to declaring it on the HTML element. : */
+    :root {
+      --base: #ffc600; /* These three lines are us defining CSS variables called --base, --spacing, and --blur. */
+      --spacing: 50px;
+      --blur: 10px;
+    }
+
+    img { /* In this section we're setting the CSS formatting for the <img> tag, but for our styling, we're defining it with CSS variables, not CSS fixed values.  */
+      padding: var(--spacing); /* we use "var" to USE the CSS variable. using '--' before the variable is CSS standard. That's how they made it. */
+      background: var(--base);
+      filter: blur(var(--blur));
+    }
+
+    .hl { /* This style section controls the .hl <span> element inside the <h2> element. */
+      color: var(--base);
+    }
 
     /*
       misc styles, nothing to do with CSS variables
@@ -45,7 +62,18 @@
   </style>
 
   <script>
+    const inputs = document.querySelectorAll('.controls input'); // << ¿So I think this line is saying to look through the HTML document for all of the <input> tags inside with the .controls class... right? And call all of those things the variable inputs? AHHHH!!!! I think I get it!!! From Wes: "querySelector gives you a node list (which is different than an array). It looks like an array, but it's not an array. The difference btwn a node list and an array is that an array has all kinds of methods for dealing with an array like map, reduce, etc. If you run this line of code in the console in the browser and open up the prototype from the NodeList, you can see all the methods you can use on the NodeList, but it's limited (entries, forEach, item, keys, value). You can convert a NodeList to an array, and in some cases you will have to do that, but in our case today we're just going to use the forEach method."
+
+    function handleUpdate(){
+      const suffix = this.dataset.sizing || ''; //"this" here refers to each <input> element BECAUSE of how lines 53/54 call the handleUpdate function for each input. Wes: "A dataset is an object that will contain all the 'data-' attributes from that specific element," i.e., ALL of the "data-" attributes that you make up for that element. E.g. if you had this element: <input id="spacing" type="range" name="spacing" min="10" max="200" value="10" data-sizing="px" data-julia="pop" data-cool="yes">, then the dataset would be {sizing="px", julia="pop", cool="yes"}. Wes "Dataset is just an object that'll already... you don't have to select it, you don't have to use any attribute selectors to select it, it will just take everything that has 'data-', on that element and put it into a nice tidy little object" 
+      document.documentElement.style.setProperty(`--${this.name}`, this.value + suffix); // To select a variable in our JavaScript, we select our entire document (:root) and set a property of base, spacing, or blur. // The first parameter for setProperty is name of the CSS property you're changing, and the second parameter is what you're changing the value to. So this is like saying:
+      // document.documentElement.style.setProperty(`--blur`, 50px);
+    }
+    inputs.forEach(input => input.addEventListener('change', handleUpdate)); // this makes the value for each input update whenever the value is updated and the slider let go of. This line also calls the handleUpdate function for each input element, which makes the <input> element the object on which .this is being called.
+    inputs.forEach(input => input.addEventListener('mousemove', handleUpdate));  // this makes the value for each input update whenever you move your mouse, which is more than you really need, but also this means it will update when you move the slider and before you let go of the slider.
   </script>
 
 </body>
 </html>
+
+<!-- WHERE YOU ARE 12/10 508PM: You are complete with video BUT spacing function is working as expected but base color is not updateing on mouse move and blur is not updating at all -->
