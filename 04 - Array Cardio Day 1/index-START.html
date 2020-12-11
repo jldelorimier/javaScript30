@@ -12,7 +12,7 @@
 
     // Some data we can work with
 
-    const inventors = [
+    const inventors = [ // "inventors" is an array of objects; each object has a key for first name (first:), last name (last:), year (they were born presumably) (year:) and year (they died presumably) (passed:)
       { first: 'Albert', last: 'Einstein', year: 1879, passed: 1955 },
       { first: 'Isaac', last: 'Newton', year: 1643, passed: 1727 },
       { first: 'Galileo', last: 'Galilei', year: 1564, passed: 1642 },
@@ -27,7 +27,7 @@
       { first: 'Hanna', last: 'Hammarström', year: 1829, passed: 1909 }
     ];
 
-    const people = [
+    const people = [ // "people" is just an array of strings. each string contains a first name and a last name
       'Bernhard, Sandra', 'Bethea, Erin', 'Becker, Carl', 'Bentsen, Lloyd', 'Beckett, Samuel', 'Blake, William', 'Berger, Ric', 'Beddoes, Mick', 'Beethoven, Ludwig',
       'Belloc, Hilaire', 'Begin, Menachem', 'Bellow, Saul', 'Benchley, Robert', 'Blair, Robert', 'Benenson, Peter', 'Benjamin, Walter', 'Berlin, Irving',
       'Benn, Tony', 'Benson, Leana', 'Bent, Silas', 'Berle, Milton', 'Berry, Halle', 'Biko, Steve', 'Beck, Glenn', 'Bergman, Ingmar', 'Black, Elk', 'Berio, Luciano',
@@ -37,12 +37,37 @@
     
     // Array.prototype.filter()
     // 1. Filter the list of inventors for those who were born in the 1500's
-
+    // .filter returns a new array of all the elements of the original array that pass a certain test defined by your function: .filter(yourFunction)
+    const inventorsBornIn1500s = inventors.filter(function(inventor){ // For .filter, you pass it a function, and that function will loop over every in the array. ¿I think when we put (inventor) inside the function, we're telling the function that each element of the array is called an inventor?
+      if(inventor.year >= 1500 && inventor.year < 1600){ // I didn't know you could refer to an object key by the object.key!
+        return true // if you return true, you're keeping this inventor
+      }
+    });
+    console.log(inventorsBornIn1500s);
+    console.table(inventorsBornIn1500s); // These two lines, 45 & 46, return the same thing, except that .table returns it in a pretty table instead of a difficult to read array of objects.
+    
     // Array.prototype.map()
     // 2. Give us an array of the inventors first and last names
+    // .map is like a factory that takes in a raw material, stamps it somehow (with a function), and then returns the result
+    const fullNames = inventors.map(inventor => `${inventor.first} ${inventor.last}`); // wow, I pretty much got this one right on the first try!!!
+    console.log(fullNames)
 
     // Array.prototype.sort()
     // 3. Sort the inventors by birthdate, oldest to youngest
+    // About .sort compareFunction: array.sort(compareFunction). The compareFunction that you put there will define an alternative sort order (alternative to alphabetical or descending numeric order). Should return a negative, zero, or positive value. Ex: function(a, b){return a-b}; When the sort() method compares two values, it sends the values to the compare function and sorts the values according to the returned value. The elements will then bubble up according to the returned values.
+    const inventorsSorted = inventors.sort(function(personA, personB) { // So I think with the sort(function(a, b)), a and b always represent two current indexes that you're comparing as you move up the array.
+      if(personA.year > personB.year){
+        return 1;
+      }
+      else {
+        return -1;
+      }
+    });
+    console.table(inventorsSorted)
+
+    //Second quicker way to do the same function above. We will use a ternary function which is like a shorthand for an if statement. So if the thing before the ? is true, then return the thing after the ? (1), otherwise (:), return the thing after the : (-1). This is a ternary operator
+    const ordered = inventors.sort((a, b) => a.year > b.year ? 1 : -1); // 
+    console.table(ordered)
 
     // Array.prototype.reduce()
     // 4. How many years did all the inventors live all together?
