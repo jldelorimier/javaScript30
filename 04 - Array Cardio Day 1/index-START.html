@@ -69,17 +69,43 @@
     const ordered = inventors.sort((a, b) => a.year > b.year ? 1 : -1); // 
     console.table(ordered)
 
+    // *** 12/10/20 1102PM: YOUR NEXT THING IS PROBLEM 4 HERE ***
     // Array.prototype.reduce()
+    // .reduce reduces the array to one value based on the function you give it and returns the total of those values. It requires two parameters: (1) the function manipulating each element to be added to the running total, (2) the value to initiate the running total at. Inside the function, you must use at least two parameters: "total" (the running total) and the thing you're manipulating each round (i.e. I think whatever variable you want to represent each element?). Don't forget to put the starting value of the running total AFTER the function {} in the .reduce() parameters.
     // 4. How many years did all the inventors live all together?
+    const yearsTogether = inventors.reduce((total, inventor) => {
+      return total + (inventor.passed - inventor.year);
+    }, 0);
 
-    // 5. Sort the inventors by years lived
+    console.table(yearsTogether);
+
+    // 5. Sort the inventors by years lived // I did this one right all by myself the first time INCLUDING the tornary function one!!!!
+    const whoLivedLongest = inventors.sort((a, b) => {
+      if ((a.passed-a.year)>(b.passed-b.year)){
+        return -1;
+      }
+      else {
+        return 1;
+      }
+    });
+
+    console.table(whoLivedLongest);
+
+    const whoLivedLongestEfficient = inventors.sort((a, b) => (a.passed-a.year)>(b.passed-b.year) ? -1 : 1);
+
+    console.table(whoLivedLongestEfficient)
 
     // 6. create a list of Boulevards in Paris that contain 'de' anywhere in the name
     // https://en.wikipedia.org/wiki/Category:Boulevards_in_Paris
-
+    // YOU SKIPPED THIS IN THE VIDEO. GO BACK TO IT AT 12M30S
 
     // 7. sort Exercise
     // Sort the people alphabetically by last name
+    const peopleSorted = people.sort();
+
+    console.table(peopleSorted);
+
+    // MINE WORKS, BUT HE DID HIS DIFFERENTLY WITH WAY MORE CODE, BUT HIS VERSION IS PROBABLY MORE EASILY MODIFIABLE LATER. 
 
     // 8. Reduce Exercise
     // Sum up the instances of each of these
