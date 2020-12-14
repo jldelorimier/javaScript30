@@ -15,7 +15,70 @@
     </ul>
   </form>
 <script>
-const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json'; // (1) Wes found a cities .json file on GitHub (that included city name, state name, and population), and put that into a URL and declared a variable equal to that URL as a string. 
+const cities = [];
+// (2) need to fetch data
+// (3) once it's back, whenever someone types into input box, we will filter the array down into a subset of all the ones where either the city name or state name match. (a) we need an empty array to put our cities into. (b) fetch our data. We will use a new API in the browser called fetch. W3Schools says: "The Fetch API interface allows web browser to make HTTP requests to web servers" Wes: "If you've done an HTML or XML http request in the browser before, you probably have used jquery, dollar.getjson, or a library like axios, however, the browser now has a new one built in called fetch. So that's what we're going to use. We're going to call fetch and fetch the endpoint. And what fetch will do, if you're used to maybe running a callback, like this -- function and you have the data, and then you can console.log the data  ..."
+  // fetch(endpoint, function(data){
+  //   console.log(data)
+  // });
+// "...it works a little bit differently than that because fetch itself will return what is called a promise. And I'll show you that. If we were to just put that in a variable, it doesn't return the data, it returns what's called a promise. Which is sort of like 'something will eventually come back from this fetch.'"
+
+// const prom  = fetch(endpoint); // this ¿function? through the "fetch" API is returning a "promise", which basically says something will eventually come back from this fetch. Wes: "the way to work with a promise, is you call .then against it, which will then return a "blob" of data. And I'll show you why. You might think, well wouldn't that just be the list of cities? Let's console.log the blob... So this is what comes back: Response, cors, 200, ok is true, headers... if you open up the body, there's a ReadableStream, locked:false? tee? what's going on here? What's happening is that the data that comes back from our fetch, it doesn't know what kind of data it us just yet. It could be an image, it could be some HTML, some music. We explicitly know that it is json. So you might think okay that's fine, so why don't we just do (blob => JSON.parse(blob));, that should worik. But it doesn't, because the blob the blob has to be converted from the raw data that it is in into JSON. So what you do from this is you call blob. And if you look at this blob, and you open the prototype, you see that there is a method called json right there. So if you call blob.json(), that itself is going to return another promise, which we're going to call .then() on, and that is going to give you the raw data, which we can then console.log."
+fetch(endpoint)
+  .then(blob => blob.json()) //Wes: "if you call blob.json(), that itself is going to return another promise, which we're going to call .then() on..." ¿why can't you just console.log blob.json() right there? Because blob.json() only returns the promise itself, not the raw data. I still don't get this.
+  //", and that is going to give you the raw data, which we can then console.log." ¿Why does this new .then return the raw data itself? ¿What is .then doing? .then I think is the Promise method you have to use to handle promises, and eventually kick back the value of the result.
+  // .then(data => cities.push(data)) // If you do this, it puts all of the data of the long array as one element into the empty array. So you get back an array one element long, with another array inide of it with 1000 elements. You can make the elements themselves push into the array as elements though if you "spread" into the push method using "..."
+  // console.log(cities) //¿Why does this return an empty array in the console, but when I type "cities" into the console, it returns all the content of the data with the long array?
+  .then(data => cities.push(...data))
+
+// (c) Then next thing we need to do is that when someone types into this box here, I need to run a function that is going to take this massive array and filter it down into a subset where you can then listen for it. So I'm going to create a function here called findMatches which will take in a word to match and the cities array:
+
+function findMatches(wordToMatch, cities){ // ¿How does it know to take in what the user types in as the parameter wordToMatch? Is it because we call the displayMatches function on searchInput in line 56? 
+  return cities.filter(place => {
+    // here we need to figure out if the city or state matches what was searched
+    // return place.city.match(/bos/i) Normally you could do this.. in this function inside the filter method, we're calling each element of the cities array "place", and then in the line written here on line 40, we're calling the "city" key of that array and then running .match on it, which must be its own method.
+    // return place.city.match(/bos/gi) // we can't plug something like "/bos/gi" directly into the .match() method, because we have to tell it to accept whatever the user is inputting, which will be its own variable. So instead of this line, we write these two lines:
+    const regex = new RegExp(wordToMatch, 'gi') // ¿I guess this is a constructor Function that makes a JavaScript regular expression where the pattern to match is the first parameter, and modifiers for the regular expression can be included in a string?
+    return place.city.match(regex) || place.state.match(regex) //¿I didn't know you could use an || in a return statement? How does this work?? If the first one is true OR the second one is true then the whole thing will be true "and therefore our filter is going to be made much smaller." Now, for example, if you run findMatches('Bos', cities) in your console, it will return an array with two objects in it, one for each of the two cities that has 'bos' in its name.
+  })
+}
+
+//(d) Now we need to make our display function.
+
+function numberWithCommas(x) { //find a function like this on stack overflow and just plug it in and apply it to a variable like place.population. 
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function displayMatches(){ // This function should be called whenever a user changes the value in the search text input.
+  console.log(this); // The value of .this for this function is what the user has just typed in.
+  console.log(this.value); // The value of .this for this function is what the user has just typed in.
+  const matchArray = findMatches(this.value, cities);
+  console.log(matchArray); // Now we are getting back the data we need in the console. Next, we need to create the HTML to show that data. Wes: "That's really what I like to stress when we're doing this stuff: get your data first, get all your functionality in place, and then we'll worry about hooking it up to event listeners as well as creating the HTML that we need there."
+  const html = matchArray.map(place => { // I knew when we started mapping over the array, that what we would need to do is create a li element for each city. But I wasn't sure how to put that back into the HTML. It sounds like the answer is .innerHTML.
+    // Wes says that to add highlighting to the part that's already typed in, before we return we have to "create a regex that will match the city name, and then we'll use that regex to replace the word that it matches, like 'wes', with just a span with a class of hl, and the word that it matches. This will pluck the word 'wes' out and replace it with a span with a class of hl."
+    const regex = new RegExp(this.value, 'gi');// This is a different variable than the "regex" declared on line 42 in the findMatches function. Remember, const is block scope, which means that since it's in a different set of {}, you can declare it again. The 'g' modifier for globally means that if the same letter(s) pattern matches more than once in the same place, we will highlight it more than once. 
+    const cityName = place.city.replace(regex, `<span class="hl">${this.value}</span>`); //.replace must be a method you can run on a string that replaces a specific part of a string... how nift.
+    const stateName = place.state.replace(regex, `<span class="hl">${this.value}</span>`); 
+
+    return ` 
+      <li>
+        <span class="name">${cityName}, ${stateName}</span> 
+        <span class="population">${numberWithCommas(place.population)}</span>
+      </li>
+    `; // I tested what the inner HTML would look like if I used <div> instead of <span>, and they pretty much look the same.
+  }).join(''); // ¿So I think this takes the whole array (which you named "html") that you're making out of the matchArray.map array, and makes it a string. Which I guess is what you want? If you don't join the array, then what you get inside your <ul> element is a bunch of <li> elements but with commas between them. And the commas show in the UI. To get rid of the commas, just join it all as one string. 
+  console.log(`The html element is ${html}`) // This is an array of html <li> elements, and I guess we really just want a string of them. 
+  suggestions.innerHTML = html; // so this is going to send each list item as writing... it's almost like a string... ¿is it a string? to inside the HTML element with the class "suggestions", which is the <ul> element in the body. 
+}
+//We still need to make it so it highlights the letters in the matchArray that match what the user typed in and format the population numbers with commas. For the population commas, I bet there's a number method we can add to the end of place.population on line 58 that will simply add the commas for us. For the place.city, place.state.... will we add an 'if' statement or something? That's like "if this.value = ".... add a hl class? I don't know how to do this one. 
+// What we actually did: To highlight the part of the word that was being searched for, we created a new regex variable that was the thing the user is typing in (this.value) and then used the .replace string method on the place.city string value to replace it with more inner html that was a span with a class of hl and the contents of which was this.value. We then named all that new string with the replaced section it's own variable and called that in the <li> <span> elements instead of the original place.city variable. We did the same thing with the place.state. To add commas to the numbers, we simply found a function on stack overflow that does that, added it to our code, and then instead of just calling place.population in the <span> element, we called place.population with the numberWithCommas method applied to it, i.e. ${numberWithCommas(place.population)}.
+
+const searchInput = document.querySelector('.search'); // "now we need to select this input that we're working with here."
+const suggestions = document.querySelector('.suggestions') // "and we also want to select this ul here, which is suggestions."
+
+searchInput.addEventListener('change', displayMatches); // Because we call displayMatches on the searchInput element, .this becomes the result of that, which is whatever the user typed in. Note the change event only fires once you click off the the element you're changing; if you want it to also fire during keyoff, add another event listener:
+searchInput.addEventListener('keyup', displayMatches);
 
 </script>
 </body>
