@@ -1,3 +1,4 @@
+<!-- Mine works except that, mine is only animating in on the FIRST mouseenter events, and not later ones if I do it again. For later ones, it appears instantly, it doesn't fade in. Wes' animates every time. Why is that? -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,14 +8,14 @@
 <body>
   <h2>Cool</h2>
   <nav class="top">
-    <div class="dropdownBackground">
+    <div class="dropdownBackground"> <!-- This div is one white background that will be used for all three dropdowns. The background is going to move with where your mouse hovers over the buttons. Note, since this div is inside of the nav element, we'll have to deal with margin and padding while we're trying to get the position of an element inside of the nav.-->
       <span class="arrow"></span>
     </div>
 
     <ul class="cool">
       <li>
         <a href="#">About Me</a>
-        <div class="dropdown dropdown1">
+        <div class="dropdown dropdown1"> <!-- The dropdown can be any element. In this case it's a div. The class="dropdown dropdown1" is why it's invisible in the start. ¿Not really sure why all of them seem to be listed horizontally though instead of vertically. I thought vertical would be the default format for <li> elements?-->
           <div class="bio">
             <img src="https://logo.clearbit.com/wesbos.com">
             <p>Wes Bos sure does love web development. He teaches things like JavaScript, CSS and BBQ. Wait. BBQ isn't part of web development. It should be though!</p>
@@ -23,7 +24,7 @@
       </li>
       <li>
         <a href="#">Courses</a>
-        <ul class="dropdown courses">
+        <ul class="dropdown courses"> <!-- In this case the dropdown is an unordered list. The class="dropdown courses" is why it's invisible in the start.-->
           <li>
             <span class="code">RFB</span>
             <a href="https://ReactForBeginners.com">React For Beginners</a>
@@ -64,7 +65,7 @@
       </li>
       <li>
         <a href="#">Other Links</a>
-        <ul class="dropdown dropdown3">
+        <ul class="dropdown dropdown3"> <!-- In this case the dropdown is an unordered list. The class="dropdown dropdown3" is why it's invisible in the start.-->
           <li><a class="button" href="http://twitter.com/wesbos">Twitter</a></li>
           <li><a class="button" href="http://facebook.com/wesbos.developer">Facebook</a></li>
           <li><a class="button" href="http://wesbos.com">Blog</a></li>
@@ -124,12 +125,12 @@
   }
 
   .cool > li {
-    position: relative;
+    position: relative; /*This is an important starting line of CSS. We're going to be writing the other CSS.*/
     display: flex;
     justify-content: center;
   }
 
-  .dropdown {
+  .dropdown { /*The opacity:0 and display: none properties in conjunction with each other are what make you not be able to see the dropdown elements in the first place. The reason why Wes made two elements cause the invisibility is because you cannot BOTH go from opacity 0 to 1, AND display: none to display: block. Wes: "That's a bit of a pain, but what we're going to do is we're sort of goingt to step it. Where when we have .trigger-enter .dropdown, it will change the display to block (line 145). If you've used animations in either React or Angular, this is how animations or transitions work inside of those frameworks. They just apply two separate classes when something enters or leaves, and then you can use your CSS to do that sort of staged move there. "*/
     opacity: 0;
     position: absolute;
     overflow: hidden;
@@ -161,7 +162,7 @@
     transform-origin: 50% 0;
     display: flex;
     justify-content: center;
-    opacity:0;
+    opacity:0; 
   }
 
   .dropdownBackground.open {
@@ -220,6 +221,57 @@
 </style>
 
 <script>
+  //(1) Define variables:
+  const triggers = document.querySelectorAll('.cool > li'); // '.cool > li' makes sure it selects all the <li> elements that are direct descendants of the class="cool" element.
+  const background = document.querySelector('.dropdownBackground'); // << Make sure you use only querySelector here, not querySelectorAll, because we want just one element, not a node list. 
+  const nav = document.querySelector('.top'); // ¿Why does the nav need to be its own variable? I don't think it's moving...
+
+  //(2) Listen for a hoverin & hoverout or mouseenter / mouseleave event on each of these these <li> items.
+  // We need to make two functions: (a) to tell us what to do on the mouseenter event ("handleEnter"), and (b) to tell us what to do on the mouseleave event ("handleLeave"):
+  function handleEnter(){
+    console.log('ENTERING!!!') // In this function, maybe we can use the .getBoundingClientRect for each <li> to find the bounds of the <li> element and then ... make a variable using .getBoundingClientRect() on the li element ('this' in  the handleEnter function). Make a variable that is the coordinates of that variable as an object using the .getBoundingClientRect properties to define key values inside of the object. Then manipulate the width, height, and x/y position of the "dropdownBackground" div style attribute using .style.width or .style.height etc. on the "background" variable which is what you named the "dropdownBackground" div.
+    // Wes: "Whenever I hover over the <li>, I want to find the dropdown inside of it and then display it." We will do this by adding and removing classes, and then leaning on CSS. so we use this.classList.add...:
+    this.classList.add('trigger-enter'); // "this" is the <li> item.
+    // we then also want to add a class of 'trigger-enter-active' after 150ms. to make it happen 150ms after the 'trigger-enter' addition, write a setTimeout function next. ¿You can just write function(){} like that without giving the function a name??? Maybe you can only do this when you're using the setTimeout method? ¿not sure if setTimeout is a method or a function. Inside the setTimeout function, "this" is the window IF you write out function(){}; HOWEVER, you can make "this" inherit the value of "this" if you use an arrow function. Wes: "When you enter into a function, the value of "this" changes. However, if you change that into an arrow function, the value of "this" is inherited from the parent function."
+    setTimeout(() => {
+      if(this.classList.contains('trigger-enter')){ // putting this.classList.add('trigger-enter-active') inside of an if statement will make it so that 'trigger-enter-active' is only added to the class list if the mouse is still on it. Otherwise if you move the mouse on and off really fast, 'trigger-enter-active' will trigger 150s after the mouseover event, EVEN if the mouse is NO LONGER over that element.
+        this.classList.add('trigger-enter-active')
+      }
+    }, 150);
+    // setTimeout(() => this.classList.contains('trigger-enter') && this.classList.add('trigger-enter-active'), 150); Wes does the setTimeout() in this way with just one line of code, but I don't fully understand it. He says: "If this.classList.contains('trigger-enter') is true, then this.classList.add('trigger-enter-active') will run. If the first part before the && is false, then it doesn't bother checking the second one. So the .add will never run unless the first part is true."
+    // Now we need more JS to add the .dropdown element behind this 
+    //this.classList.add('.dropdownBackground'); // << I just added this on my own to guess. Who knows if it's right.
+    //Mine is only animating in on the FIRST mouseenter events, and not later ones if I do it again. For later ones, it appears instantly, it doesn't fade in. Wes' animates every time. Why is that?
+    //Wes: "Next we have to figure out how big is the <ul class="dropdown">, and then can that little white div go behind it." Define a variable that will give you the dimensions/position of the ul element:
+    background.classList.add('open'); // Adding and removing the 'open' class is what changes the backgrounds opacity and makes it show/hide.
+    console.log(this) // "this" is still the <li> element
+    const dropdown = this.querySelector('.dropdown'); // ¿we use this.querySelector and not document.querySelector I THINK because we need to make sure we're selecting the element with class="dropdown" inside the correct <li> element. That's gotta be it.
+    console.log(dropdown) 
+    const dropdownCoords = dropdown.getBoundingClientRect(); // << I added this. it's not what Wes is using though.
+    console.log(dropdownCoords); // We can't JUST grab the dropdownCoords because we can't assume that the <nav> element is always going to be the first element on the page. If there was an <h2> above it, it would bump everything down. The coordinates dropdownCoords is giving you now is relative absolutely to the page, it doesn't take things like another <h2> element into account. So we need to grab the coordinates from the nav as well. 
+    const navCoords = nav.getBoundingClientRect(); // I did navCoords = document.querySelector('.top'), but ¿I guess you can just name the element instead of doing a querySelector ¿if there's just one? NOTE: ¿I think Wes said that if an element is "hidden" in the CSS, then you can't get these properties from it. So you have to unhide it in order to use .getBoundingClientRect() I think? Wes: "Because otherwise, if it was hidden, yo ucan't tell the height of a hidden element, so it needs to be on the page, even if it's visibly not there with opacity."
+    console.log(navCoords)
+    const coords = {
+      width: dropdownCoords.width,
+      height: dropdownCoords.height,
+      top: dropdownCoords.top - navCoords.top, // Wes before we added - navCoords.top: "See how everything is messed up? That's because the coordinates that we get are off a little bit because the h2 above the nav element is pushing the nav element down. So you can't always assume that everything is going to be anchored to the top of the actual page, and that's why we've grabbed the nav coordinates right here. Because we need to take our dropdown coords and then offset them with the top nav. So if the top nav is 30px, we know it's been bumped down 30px, so the value of the top of this white box needs to be moved up 30px. And same for the left nav coords." ¿Don't fully understand why it's subtraction here, I need to think about this?
+      left: dropdownCoords.left - navCoords.left
+    }
+    //Now that you've defined your coordinates, you can apply width & height to the background element by adding them as style attributes:
+    background.style.setProperty('width', `${coords.width}px`); //I did background.style.width = `${coords.width}px` & background.style.height = `${coords.height}px`, but he's doing it with background.style.setProperty('height', coords.height); ¿Why isn't he doing it my way/the same way as it the other video? I tested this way too and it seems to be working as well. 
+    background.style.setProperty('height', `${coords.height}px`); 
+    background.style.setProperty('transform', `translate(${coords.left}px, ${coords.top}px)`); 
+  };
+  
+  function handleLeave(){
+    console.log('LEAVING!!!')
+    this.classList.remove('trigger-event-active', 'trigger-enter'); // We don't need a setTimeout function line for this function also because we're not animating it out. 
+    background.classList.remove('open');
+  }
+
+  triggers.forEach(trigger => trigger.addEventListener('mouseenter', handleEnter));
+  triggers.forEach(trigger => trigger.addEventListener('mouseleave', handleLeave));
+
 </script>
 
 </body>
