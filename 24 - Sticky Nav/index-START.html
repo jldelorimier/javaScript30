@@ -1,3 +1,5 @@
+<!-- In this case, we only had one event listener, which listened to scroll. The handler function for the event listener used an if/else statement to run different code when we were on/above the nav bar, or below it. -->
+<!-- Wes: Understanding that you need to take care of that extra space (offset the top padding when the fixNav function runs) when you "fix it" is really the key to this one. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,6 +56,43 @@
   </div>
 
 <script>
+  const nav = document.querySelector('#main'); // I did const nav = document.getElementById('main') which works. Wes' way uses querySelector also to find an id!
+  console.log(nav)
+  const topOfNav = nav.offsetTop;
+  const logo = document.querySelector('.logo');
+  console.log(logo)
+  
+  function fixNav(){ // I did function navBarRelease(){}. Wes just did fixNav.
+    console.log(topOfNav, window.scrollY)
+    if (window.scrollY >= topOfNav){
+      document.body.style.paddingTop = nav.offsetHeight
+      document.body.classList.add('fixed-nav'); // i did it this way, nav.style.setProperty('position', 'fixed');, WHICH WORKED!!!! but Wes says he likes putting it on the body element. Wes: "When I do things like this, I like popping the class on the body just so that I can always target any of the children when we're in the fixed nav state. Some people like to put it on the nav itself, but I've found if I want to target anything else then it's nice to have it nice and high on the body.""  ¿I don't understand how he can put it on the body, because wouldn't that make it so the whole body didn't move? Also, 'fixed-nav' is not in our CSS class list, so how can he add it? Yes, I'm right. We're going to build our own CSS class for it. 
+      document.body.style.paddingTop = nav.offsetHeight + 'px'; //When you make an element fixed in CSS, you know it is no longer taking up space in the document; it sort of floats on top of the browser. And by doing that, what's happening is, we cause a reflow on the page. And then the div with the class="site-wrap", which is right below the nav element in the body, says, "Oh, this nav is no longer taking up space. Well don't mind if I do!" and it moves on up the exact amount of space that it gave up. So we need to offset that amount by adding some padding to our body. Just when we make it fixed, we need to offset that amount so the div doesn't jerk up right when the nav bar hits the top of the window.
+      //logo.style.setProperty('overflow', 'visible'); This is what I did. Wes did it differently, but mine worked. Wes just added more CSS under a new .fixed-nav li.logo section that will change the max-width property for the <li> element with the class="logo" to something really big when the body has the .fixed-nav class. This way, don't need to add any more code in the JS to tell it when to trigger the changes, bc they're already included when .fixed-nav is added to the body.
+      // logo.style.setProperty('max-width', '90px'); This is what I did. Wes did it differently, but mine worked.
+    }
+    else {
+      document.body.classList.remove('fixed-nav'); // I did it this way, WHICH WORKED!!! nav.style.setProperty('position', 'relative'); Wes did it a different way.
+      document.body.style.paddingTop = 0 + 'px'; // Wes just does 0 without the + 'px'; Why doesn't 0 need the px?
+      // logo.style.setProperty('overflow', 'hidden'); This is what I did. Wes did it differently, but mine worked.
+      // logo.style.setProperty('max-width', '0px'); This is what I did. Wes did it differently, but mine worked.
+    }
+  }
+
+  // function navBarTop(){ My first draft of what I thought the function would be.
+    // if statement to see if nav is inside view port. 
+      // if yes, nothing happens
+      // if no,
+        // nav.style.setProperty('position', 'fixed');
+        // logo.style.setProperty('overflow', 'visible');
+  // }
+
+  
+  //We will listen for page scroll on the window, not on the nav bar like I tried to write:
+  window.addEventListener('scroll', fixNav);
+  //nav.addEventListener('scroll', navBarTop)
+  //nav.addEventListener('scroll', navBarRelease) // there's probably only one eventListener and just one more complex function if the only thing to listen for is the scroll.
+
 
 </script>
 

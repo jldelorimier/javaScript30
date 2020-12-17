@@ -25,6 +25,10 @@ body {
   transition: transform 0.5s;
 }
 
+.fixed-nav .site-wrap {
+  transform: scale(1); /* If you look above, Wes gave .site-wrap a default scale of .98 (98%). This little thing makes it so that when the body has a class of .fixed-nav, the site wrap will scale up to 1 (100%). So when you go from 98% > 100%, you get a nice little effect when you scroll down. Wes: "I really like these things because all we did there was add one class to the body, and then everything else is taken care of in our CSS."*/
+}
+
 header {
   text-align: center;
   height: 50vh;
@@ -50,6 +54,11 @@ nav {
   z-index: 1;
 }
 
+.fixed-nav nav { /* "When the body has a class of "fixed-nav", then the nav itself is going to be position fixed. And we're going to put a little box shadow on it too... just give it a little bit of a shadow so when it is in that fixed state, you have a shadow showing that you have some depth there. */
+  position: fixed; /* When you make an element fixed in CSS, you know it is no longer taking up space in the document; it sort of floats on top of the browser. And by doing that, what's happening is, we cause a reflow on the page. And then the div with the class="site-wrap", which is right below the nav element in the body, says, "Oh, this nav is no longer taking up space. Well don't mind if I do!" and it moves on up the exact amount of space that it gave up. So we need to offset that amount by adding some padding to our body. Just as we make it fixed, we need to offset that amount so the div doesn't jerk up right when the nav bar hits the top of the window. */
+  box-shadow: 0 5px rgba(0, 0, 0, 1);
+}
+
 nav ul {
   margin: 0;
   padding:0;
@@ -72,6 +81,10 @@ li.logo {
   transition: all .5s;
   font-weight: 600;
   font-size: 30px;
+}
+
+.fixed-nav li.logo { /* This is saying: When the body has a class of fixed-nav, the <li> with the class="logo" is going to have a max-width of something... bigger than zero. */
+  max-width: 500px; /* Wes: "Why didn't I use width: 0; in li.logo{} and width: auto in .fixed-nav li.logo{}? Because you cannot animate the width of something to be from 0 to auto -- you have to use a max width in order to get that transition to kick in. " */
 }
 
 li.logo a {
